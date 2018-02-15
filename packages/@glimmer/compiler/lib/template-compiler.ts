@@ -361,7 +361,7 @@ export default class TemplateCompiler {
     this.opcode('prepareObject', null, pairs.length);
   }
 
-  prepareAttributeValue(value: AST.AttrNode['value']) {
+  prepareAttributeValue(value: AST.AttrNode['value']) : boolean {
     // returns the static value if the value is static
 
     switch (value.type) {
@@ -372,6 +372,10 @@ export default class TemplateCompiler {
         this.attributeMustache([value]);
         return false;
       case 'ConcatStatement':
+        if (value.parts.length === 1) {
+          return this.prepareAttributeValue(value.parts[0]);
+        }
+
         this.prepareConcatParts(value.parts);
         this.opcode('concat', value);
         return false;
